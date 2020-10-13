@@ -1,0 +1,17 @@
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+
+const schema = new Schema(
+  {
+    message: { type: String, required: true },
+    from: { type: String, required: true },
+    to: { type: String, required: true },
+  },
+  { timestamps: true }
+);
+
+schema.set("toJSON", {
+  versionKey: false,
+});
+
+module.exports = mongoose.model("Message", schema);

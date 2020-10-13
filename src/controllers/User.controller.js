@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../helpers/db");
 const config = require("../../config");
 
+//TODO: convert this to functional module and hadle errors in a common place
 /**
  * User controller
  */
@@ -54,7 +55,7 @@ class UserController {
         const accessToken = jwt.sign(
           { userId: user.id, username },
           config.ACCESS_TOKEN_SECRET,
-          { expiresIn: "1h" }
+          { expiresIn: "5d" }
         );
 
         return {
@@ -72,7 +73,7 @@ class UserController {
       //Return unauthorized error
       return {
         status: 401,
-        error: "Invalid username or password",
+        message: "Invalid username or password",
       };
     } catch (err) {
       return this._handleError(err);
@@ -85,7 +86,7 @@ class UserController {
   async getAll() {
     try {
       const users = await User.find();
-      console.log(users);
+
       return {
         status: 200,
         data: users,
@@ -100,12 +101,12 @@ class UserController {
     if (err.name == "ValidationError") {
       return {
         status: 400,
-        error: err,
+        message: err,
       };
     } else {
       return {
         status: 500,
-        error: "Internal server error",
+        message: "Internal server error",
       };
     }
   }

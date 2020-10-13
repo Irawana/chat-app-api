@@ -9,4 +9,5 @@ mongoose.connect(config.MONGO_URL, {
 
 module.exports = {
   User: require("../models/user.model"),
+  Message: require("../models/message.model"),
 };
