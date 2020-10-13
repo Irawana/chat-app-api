@@ -1,6 +1,6 @@
 module.exports = {
   SERVICE_NAME: "Chat App API",
-  PORT: process.env.PORT || 3000,
+  PORT: process.env.PORT || 4000,
   MONGO_URL:
     "mongodb+srv://testuser:vnM6bVKi7gFvR61t@chatapp.ejx1v.mongodb.net/chat_app?retryWrites=true&w=majority",
   ACCESS_TOKEN_SECRET:

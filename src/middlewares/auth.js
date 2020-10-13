@@ -18,8 +18,8 @@ module.exports = (req, res, next) => {
   }
 
   let decodedToken;
+  //Decode auth token
   try {
-    //Decode auth token
     decodedToken = jwt.verify(accessToken, config.ACCESS_TOKEN_SECRET);
   } catch (err) {
     return res.status(401).send({ message: "Unauthorized!" });

@@ -5,6 +5,7 @@ const config = require("../../config");
 mongoose.connect(config.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useCreateIndex: true,
 });
 
 module.exports = {

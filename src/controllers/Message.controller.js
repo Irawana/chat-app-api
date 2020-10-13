@@ -1,83 +1,69 @@
-const { Message } = require("../helpers/db");
+const { Message } = require("../utils/db");
+const { handleError } = require("../utils/error");
 
 /**
- * Create message
- *
- * @param {Object} messageData
+ * Auth controller
  */
-const create = async (messageData) => {
-  const message = new Message(messageData);
-
-  try {
-    //Save message to db
-    const createdMessage = await message.save();
-    console.log(`message ${createdMessage.id} is created`);
-
-    return {
-      status: 201,
-      data: createdMessage,
-    };
-  } catch (err) {
-    return _handleError(err);
+class MessageController {
+  constructor(socket) {
+    this.socket = socket;
   }
-};
 
-//Get messages by user id
-const getByUserId = async ({ userId, params: { userId: chatUserId } }) => {
-  try {
-    const query = {
-      $or: [
-        { from: userId, to: chatUserId },
-        { to: userId, from: chatUserId },
-      ],
-    };
+  /**
+   * Create message
+   *
+   * @param {String} from
+   * @param {String} to
+   * @param {String} data
+   */
+  async create(from, to, data) {
+    const message = new Message({ from, to, message: data });
 
-    const messages = await Message.find(query, {}, { sort: { createdAt: 1 } });
+    try {
+      //Save message to db
+      const createdMessage = await message.save();
+      console.log(`message ${createdMessage.id} is created`);
 
-    return {
-      status: 200,
-      data: messages,
-    };
-  } catch (err) {
-    return _handleError(err);
+      this.socket.emit(`io.from.${from}.to.${to}`, { message: data });
+
+      return {
+        status: 201,
+        data: createdMessage,
+      };
+    } catch (err) {
+      return handleError(err);
+    }
   }
-};
 
-//Get latest message
-/* const receiveLatest = async (req) => {
-  try {
-    const message = await Message.findOne(
-      { to: req.userId },
-      {},
-      { sort: { created: -1 } }
-    );
-    console.log(message, "------------");
-    //TODO: Need to change this to get the latest message received
-    return {
-      status: 200,
-      data: message,
-    };
-  } catch (err) {
-    return _handleError(err);
-  }
-}; */
+  /**
+   * Get messages by user id
+   *
+   * @param {String} user1Id
+   * @param {String} user2Id
+   */
+  async getByUserId(user1Id, user2Id) {
+    try {
+      const query = {
+        $or: [
+          { from: user1Id, to: user2Id },
+          { to: user1Id, from: user2Id },
+        ],
+      }; //TODO: fix query
 
-//Handle errors
-function _handleError(err) {
-  if (err.name == "ValidationError") {
-    return {
-      status: 400,
-      mesasge: err,
-    };
-  } else {
-    return {
-      status: 500,
-      message: "Internal server error",
-    };
+      const messages = await Message.find(
+        query,
+        {},
+        { sort: { createdAt: 1 } }
+      );
+
+      return {
+        status: 200,
+        data: messages,
+      };
+    } catch (err) {
+      return handleError(err);
+    }
   }
 }
 
-module.exports = {
-  create,
-  getByUserId,
-};
+module.exports = MessageController;

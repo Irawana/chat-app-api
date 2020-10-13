@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+//Create mongoose schema for user
 const schema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
@@ -17,4 +18,5 @@ schema.set("toJSON", {
   },
 });
 
+//Create mongoose schem
 module.exports = mongoose.model("User", schema);
