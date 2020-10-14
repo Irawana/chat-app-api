@@ -4,7 +4,11 @@ const isAuth = require("../middlewares/auth");
 const MessageController = require("../controllers/Message.controller");
 
 module.exports = (io) => {
-  const messageController = new MessageController(io);
+  let messageController;
+
+  io.on("connection", (socket) => {
+    messageController = new MessageController(socket);
+  });
 
   /** Create message */
   router.post("/", isAuth, async ({ body: { from, to, message } }, res) => {

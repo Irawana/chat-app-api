@@ -5,8 +5,8 @@ const { handleError } = require("../utils/error");
  * Auth controller
  */
 class MessageController {
-  constructor(io) {
-    this.io = io;
+  constructor(socket) {
+    this.socket = socket;
   }
 
   /**
@@ -24,9 +24,9 @@ class MessageController {
       const createdMessage = await message.save();
       console.log(`message ${createdMessage.id} is created`);
 
-      this.io.on("connection", (socket) => {
-        socket.emit(`io.from.${from}.to.${to}`, { message: data });
-      });
+      console.log(`io.from.${from}.to.${to}`);
+
+      this.socket.broadcast.emit(`io.from.${from}.to.${to}`, { message: data });
 
       return {
         status: 201,

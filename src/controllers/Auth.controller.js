@@ -8,34 +8,35 @@ const config = require("../../config");
  * Auth controller
  */
 class AuthController {
-  constructor(io) {
-    this.io = io;
+  constructor(socket) {
+    this.socket = socket;
   }
 
   /**
    * Login
    *
-   * @param {String} username
+   * @param {String} userName
    * @param {String} password
    */
-  async login(username, password) {
+  async login(userName, password) {
     try {
-      //Get user by username
-      const user = await User.findOne({ username });
+      //Get user by userName
+      const user = await User.findOne({ username: userName });
 
       //Compare password
       if (user && bcrypt.compareSync(password, user.password)) {
         //Generate json web token
         const accessToken = jwt.sign(
-          { userId: user.id, username },
+          { userId: user.id, userName },
           config.ACCESS_TOKEN_SECRET,
           { expiresIn: "5d" } //TODO: reduce this after testing
         );
 
+        user.isLoggedIn = true;
+        user.save();
+
         //Publish an event when logged in
-        this.io.on("connection", (socket) => {
-          socket.emit("logged");
-        });
+        this.socket.broadcast.emit("logged");
 
         return {
           status: 200,
@@ -49,11 +50,21 @@ class AuthController {
       //Return unauthorized error
       return {
         status: 401,
-        data: "Invalid username or password",
+        data: "Invalid userName or password",
       };
     } catch (err) {
       return handleError(err);
     }
+  }
+
+  async logout(userId) {
+    const user = await User.findOne({ _id: userId });
+    user.isLoggedIn = false;
+    user.save();
+
+    this.socket.broadcast.emit("logout");
+
+    return { status: 200 };
   }
 }
 
