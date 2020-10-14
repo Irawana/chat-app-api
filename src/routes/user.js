@@ -3,18 +3,18 @@ const router = express.Router();
 const isAuth = require("../middlewares/auth");
 const UserController = require("../controllers/User.controller");
 
-module.exports = () => {
-  const userController = new UserController();
+const userController = new UserController();
 
-  /** Register user */
-  router.post("/", async ({ body }, res) => {
-    res.send(await userController.create(body));
-  });
+/** Register user */
+router.post("/", async ({ body }, res) => {
+  const { status, data } = await userController.create(body);
+  res.status(status).send(data);
+});
 
-  /** Get all users */
-  router.get("/", isAuth, async (req, res) => {
-    res.send(await userController.getAll());
-  });
+/** Get all users */
+router.get("/", isAuth, async (req, res) => {
+  const { status, data } = await userController.getAll();
+  res.status(status).send(data);
+});
 
-  return router;
-};
+module.exports = router;

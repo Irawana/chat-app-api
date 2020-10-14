@@ -3,12 +3,13 @@ const router = express.Router();
 const isAuth = require("../middlewares/auth");
 const MessageController = require("../controllers/Message.controller");
 
-module.exports = (socket) => {
-  const messageController = new MessageController(socket);
+module.exports = (io) => {
+  const messageController = new MessageController(io);
 
   /** Create message */
   router.post("/", isAuth, async ({ body: { from, to, message } }, res) => {
-    res.send(await messageController.create(from, to, message));
+    const { status, data } = await messageController.create(from, to, message);
+    res.status(status).send(data);
   });
 
   /** Get messsages for two users */
@@ -16,7 +17,11 @@ module.exports = (socket) => {
     "/:user1Id/:user2Id",
     isAuth,
     async ({ params: { user1Id, user2Id } }, res) => {
-      res.send(await messageController.getByUserId(user1Id, user2Id));
+      const { status, data } = await messageController.getByUserId(
+        user1Id,
+        user2Id
+      );
+      res.status(status).send(data);
     }
   );
 

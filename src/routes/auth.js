@@ -2,15 +2,17 @@ const express = require("express");
 const router = express.Router();
 const AuthController = require("../controllers/Auth.controller");
 
-module.exports = (socket) => {
-  const authController = new AuthController(socket);
+module.exports = (io) => {
+  const authController = new AuthController(io);
 
   /** login */
-  router.post("/login", async ({ body: { userName, password } }, res) => {
-    const response = await authController.login(userName, password);
-
-    res.send(response);
-  });
+  router.post(
+    "/login",
+    async ({ body: { username: userName, password } }, res) => {
+      const { status, data } = await authController.login(userName, password);
+      res.status(status).send(data);
+    }
+  );
 
   return router;
 };

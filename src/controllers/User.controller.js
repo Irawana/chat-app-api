@@ -19,7 +19,7 @@ class UserController {
         //Return error if an user already exists for the username
         return {
           status: 400,
-          message: `Username '${user.username}' is already exists`,
+          data: `Username '${user.username}' is already exists`,
         };
       }
 

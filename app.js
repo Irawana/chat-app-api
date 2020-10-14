@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const config = require("./config");
 const router = require("./src/routes");
-const userRouter = require("./src/routes/auth");
+const userRouter = require("./src/routes/user");
 const authRouter = require("./src/routes/auth");
 const messageRouter = require("./src/routes/message");
 
@@ -12,20 +12,15 @@ const app = express();
 //Middlewares
 app.use(express.json());
 app.use(cors());
+const http = require("http").createServer(app);
+const io = require("socket.io")(http);
+
 app.use("/", router);
 app.use("/user", userRouter);
+app.use("/auth", authRouter(io));
+app.use("/message", messageRouter(io));
 
 //Listen to the port
-const port = config.PORT;
-const server = app.listen(port, async () => {
-  console.log(`${config.SERVICE_NAME} is running on port ${port}`);
-});
-
-//Create server
-const io = require("socket.io")(server);
-
-//Initiate socket io connection
-io.on("connection", (socket) => {
-  app.use("/auth", authRouter);
-  app.use("/message", messageRouter(socket));
+http.listen(config.PORT, () => {
+  console.log(`listening on port :${config.PORT}`);
 });

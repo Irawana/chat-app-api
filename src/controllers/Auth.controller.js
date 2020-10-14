@@ -8,8 +8,8 @@ const config = require("../../config");
  * Auth controller
  */
 class AuthController {
-  constructor(socket) {
-    this.socket = socket;
+  constructor(io) {
+    this.io = io;
   }
 
   /**
@@ -29,14 +29,13 @@ class AuthController {
         const accessToken = jwt.sign(
           { userId: user.id, username },
           config.ACCESS_TOKEN_SECRET,
-          { expiresIn: "5d" }
+          { expiresIn: "5d" } //TODO: reduce this after testing
         );
 
-        user.isLoggedIn = true; //TODO
-        user.save(); //TODO: test and remove if this is not needed
-
         //Publish an event when logged in
-        this.socket.emit("logged");
+        this.io.on("connection", (socket) => {
+          socket.emit("logged");
+        });
 
         return {
           status: 200,
@@ -50,7 +49,7 @@ class AuthController {
       //Return unauthorized error
       return {
         status: 401,
-        message: "Invalid username or password",
+        data: "Invalid username or password",
       };
     } catch (err) {
       return handleError(err);

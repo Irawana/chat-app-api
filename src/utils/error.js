@@ -2,12 +2,12 @@ const handleError = (err) => {
   if (err.name == "ValidationError") {
     return {
       status: 400,
-      message: err,
+      data: err,
     };
   } else {
     return {
       status: 500,
-      message: "Internal server error",
+      data: "Internal server error",
     };
   }
 };
