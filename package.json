@@ -16,7 +16,7 @@
     "http": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.2",
-    "mongoose": "^5.10.9",
+    "mongoose": "^6.2.2",
     "socket.io": "^2.3.0"
   }
 }
